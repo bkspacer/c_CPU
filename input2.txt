@@ -1,0 +1,38 @@
+        JMP :hello
+        SER R1
+        SER R2
+:5
+        SER R3
+        SER R4
+        
+:1      LDI R1, 42
+        PUSH 2
+        PUSH 3
+        MUL
+        JMP :3
+:hello
+        LDI R1, 6   ;АЛОХА ЕБАТЬ
+        LDI R2, 7
+:4
+        MUL R1, R2
+        PUSH R1
+        OUT R1
+        JMP :1
+:3
+        CP
+        BRPL :more
+        
+        
+:less   CALL :swap
+        OUT
+        OUT
+:more
+        END
+
+:swap
+        POP R31
+        POP R30
+        PUSH R31
+        PUSH R30
+        RET
+        END

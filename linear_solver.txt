@@ -1,0 +1,29 @@
+        IN R1       ;   enter a
+        IN R2       ;   enter b
+        CALL :lnsolve
+        END
+
+:lnsolve
+        LDI R0, 0   ;   tmp = 0
+        CP R1, R0 
+        BRNE :anot0
+:ais0               ;   if a == 0
+        CP R2, R0
+        BRNE :bnot0  
+:bis0               ;       if b == 0
+        LDI R3, 1
+        SUB R0, R3
+        OUT R0      ;           print -1 // infinity roots
+        RET
+:bnot0              ;       else
+        OUT R0      ;           print 0 // no roots
+        RET
+        JMP :aexit
+:anot0              ;   else
+        DIV R2, R1
+        SUB R0, R2
+        MOV R1, R0  ;       root = -b / a
+        LDI R0, 1   
+        OUT R0      ;       print 1 // one root
+        OUT R1      ;       print root
+        RET
