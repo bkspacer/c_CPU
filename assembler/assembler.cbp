@@ -40,6 +40,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../lib/strings_int.h" />
+		<Unit filename="assembler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="assembler.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

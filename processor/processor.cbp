@@ -43,6 +43,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="processor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="processor.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -1,10 +1,12 @@
 #ifndef OSM_COMANDS_H_INCLUDED
 #define OSM_COMANDS_H_INCLUDED
 
-#define MAX_STR_LEN    (100)
-#define MAX_OF_ARGC    (3)
-#define SRAM_CAPACITY  (32)
-#define REG_CAPACITY   (128)
+#include "../lib/stack.h"
+
+#define MAX_STR_LEN    (100) /**< Maximun of string length */
+#define MAX_OF_ARGC    (3)   /**< Maximum of number of arguments for commands */
+#define SRAM_CAPACITY  (32)  /**< Capacity of SRAM array  */
+#define REG_CAPACITY   (128) /**< Capacity of MAX_OF_ARGC array */
 
 #define RED         "\033[0;31m"
 #define GREEN       "\033[0;32m"
@@ -15,7 +17,8 @@
 #define UNDERLINE   "\033[4m"
 #define ALERT       "\033[5m"
 
-#include "../lib/stack.h"
+#define ASM_GET( var ) ({var = *PC++; printf("\t(%s is %d)", #var, var);})
+
 
 //======================================
 //======================================
@@ -30,7 +33,15 @@ enum {LABEL_t = -1,
       S_NUM_t,
       S_REG_t};
 
-struct OSM_COM
+/** \brief Structure describing an assembler command
+ *
+ * \param name[MAX_STR_LEN] char - name of the command
+ * \param code int - hex-code of the program (ID in binary code)
+ * \param argc int - number of arguments
+ * \param argtypes[MAX_OF_ARGC] int - types on input arguments
+ *
+ */
+struct ASM_COM
 {
     char name[MAX_STR_LEN];
     int  code;
@@ -38,36 +49,41 @@ struct OSM_COM
     int  argtypes[MAX_OF_ARGC];
 };
 
-const struct OSM_COM OSM_COMANDS[] = {
+/** \brief All the commands of the assembler
+ *
+ * \warning The last command must have code (0xFF)
+ *
+ */
+const struct ASM_COM ASM_COMMANDS[] = {
 
 //=====================================================================
 //-------------------ARITHMETIC-INSTRUCTIONS---------------------------
 //=====================================================================
 
-#define OSM_ADD_CODE       (0x01)
+#define ASM_ADD_CODE       (0x01)
 {          "ADD",           0x01, 2, {REG_t, REG_t}},
 
-#define OSM_ADD_STACK_CODE (0x0A)
+#define ASM_ADD_STACK_CODE (0x0A)
 {          "ADD",           0x0A, 0, { }},
 
-#define OSM_ADD_COM( )                  \
+#define ASM_ADD_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_ADD_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
+    case ASM_ADD_CODE:                  \
+        ASM_GET(Rd);                    \
+        ASM_GET(Rr);                    \
         REG[Rd] += REG[Rr];             \
         break;                          \
                                         \
-    case OSM_ADD_STACK_CODE:            \
+    case ASM_ADD_STACK_CODE:            \
         Stack_pop(STACK, &k);           \
         Stack_pop(STACK, &K);           \
         Stack_push(STACK, k + K);       \
         break;                          \
                                         \
     default:                            \
-        printf("undefined ADD code");   \
+        printf("\nundefined ADD code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -75,30 +91,30 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_SUB_CODE       (0x02)
+#define ASM_SUB_CODE       (0x02)
 {          "SUB",           0x02, 2, {REG_t, REG_t}},
 
-#define OSM_SUB_STACK_CODE (0x0B)
+#define ASM_SUB_STACK_CODE (0x0B)
 {          "SUB",           0x0B, 0, { }},
 
-#define OSM_SUB_COM( )                  \
+#define ASM_SUB_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_SUB_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
+    case ASM_SUB_CODE:                  \
+        ASM_GET(Rd);                    \
+        ASM_GET(Rr);                    \
         REG[Rd] -= REG[Rr];             \
         break;                          \
                                         \
-    case OSM_SUB_STACK_CODE:            \
+    case ASM_SUB_STACK_CODE:            \
         Stack_pop(STACK, &k);           \
         Stack_pop(STACK, &K);           \
         Stack_push(STACK, k - K);       \
         break;                          \
                                         \
     default:                            \
-        printf("undefined SUB code");   \
+        printf("\nundefined SUB code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -106,74 +122,74 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_INC_CODE (0x03)
+#define ASM_INC_CODE (0x03)
 {          "INC",     0x03, 1, {REG_t}},
 
-#define OSM_INC_COM( )  \
+#define ASM_INC_COM( )  \
 ({                      \
-    OSM_GET(Rd);        \
+    ASM_GET(Rd);        \
     REG[Rd]++;          \
 })
 
 //====================================================
 
-#define OSM_DEC_CODE (0x04)
+#define ASM_DEC_CODE (0x04)
 {          "DEC",     0x04, 1, {REG_t}},
 
-#define OSM_DEC_COM( )  \
+#define ASM_DEC_COM( )  \
 ({                      \
-    OSM_GET(Rd);        \
+    ASM_GET(Rd);        \
     REG[Rd]--;          \
 })
 
 //====================================================
 
-#define OSM_CLR_CODE (0x05)
+#define ASM_CLR_CODE (0x05)
 {          "CLR",     0x05, 1, {REG_t}},
 
-#define OSM_CLR_COM( )  \
+#define ASM_CLR_COM( )  \
 ({                      \
-    OSM_GET(Rd);        \
+    ASM_GET(Rd);        \
     REG[Rd] = 0;        \
 })
 
 //====================================================
 
-#define OSM_SER_CODE (0x06)
+#define ASM_SER_CODE (0x06)
 {          "SER",     0x06, 1, {REG_t}},
 
-#define OSM_SER_COM( ) \
+#define ASM_SER_COM( ) \
 ({                     \
-    OSM_GET(Rd);       \
+    ASM_GET(Rd);       \
     REG[Rd] = 0;       \
 })
 
 //====================================================
 
-#define OSM_MUL_CODE       (0x07)
+#define ASM_MUL_CODE       (0x07)
 {          "MUL",           0x07, 2, {REG_t, REG_t}},
 
-#define OSM_MUL_STACK_CODE (0x0C)
+#define ASM_MUL_STACK_CODE (0x0C)
 {          "MUL",           0x0C, 0, { }},
 
-#define OSM_MUL_COM( )                  \
+#define ASM_MUL_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_MUL_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
+    case ASM_MUL_CODE:                  \
+        ASM_GET(Rd);                    \
+        ASM_GET(Rr);                    \
         REG[Rd] *= REG[Rr];             \
         break;                          \
                                         \
-    case OSM_MUL_STACK_CODE:            \
+    case ASM_MUL_STACK_CODE:            \
         Stack_pop(STACK, &K);           \
         Stack_pop(STACK, &k);           \
         Stack_push(STACK, k * K);       \
         break;                          \
                                         \
     default:                            \
-        printf("undefined MUL code");   \
+        printf("\nundefined MUL code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -181,30 +197,30 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_DIV_CODE       (0x08)
+#define ASM_DIV_CODE       (0x08)
 {          "DIV",           0x08, 2, {REG_t, REG_t}},
 
-#define OSM_DIV_STACK_CODE (0x0D)
+#define ASM_DIV_STACK_CODE (0x0D)
 {          "DIV",           0x0D, 0, { }},
 
-#define OSM_DIV_COM( )                  \
+#define ASM_DIV_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_DIV_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
+    case ASM_DIV_CODE:                  \
+        ASM_GET(Rd);                    \
+        ASM_GET(Rr);                    \
         REG[Rd] /= REG[Rr];             \
         break;                          \
                                         \
-    case OSM_DIV_STACK_CODE:            \
+    case ASM_DIV_STACK_CODE:            \
         Stack_pop(STACK, &K);           \
         Stack_pop(STACK, &k);           \
         Stack_push(STACK, K / k);       \
         break;                          \
                                         \
     default:                            \
-        printf("undefined DIV code");   \
+        printf("\nundefined DIV code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -215,10 +231,10 @@ const struct OSM_COM OSM_COMANDS[] = {
 //----------------------BRANCH-INSTRUCTIONS----------------------------
 //=====================================================================
 
-#define OSM_RET_CODE (0x00)
+#define ASM_RET_CODE (0x00)
 {          "RET",     0x00, 0, { }},
 
-#define OSM_RET_COM( )          \
+#define ASM_RET_COM( )          \
 ({                              \
     Stack_pop(CALL_STACK, &K);  \
     PC = PC0 + K;               \
@@ -226,104 +242,104 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_JMP_CODE (0x11)
+#define ASM_JMP_CODE (0x11)
 {          "JMP",     0x11, 1, {LABEL_t}},
 
-#define OSM_JMP_COM( ) \
+#define ASM_JMP_COM( ) \
 ({                     \
-    OSM_GET(K);        \
+    ASM_GET(K);        \
     PC = PC0 + K;      \
 })
 
 //====================================================
 
-#define OSM_CALL_CODE (0x12)
+#define ASM_CALL_CODE (0x12)
 {          "CALL",     0x12, 1, {LABEL_t}},
 
-#define OSM_CALL_COM( )                     \
+#define ASM_CALL_COM( )                     \
 ({                                          \
     Stack_push(CALL_STACK, PC - PC0 + 1);   \
-    OSM_GET(K);                             \
+    ASM_GET(K);                             \
     PC = PC0 + K;                           \
 })
 
 //====================================================
 
-#define OSM_CP_CODE       (0x13)
+#define ASM_CP_CODE       (0x13)
 {          "CP",           0x13, 2, {REG_t, REG_t}},
 
-#define OSM_CP_STACK_CODE (0x14)
+#define ASM_CP_STACK_CODE (0x14)
 {          "CP",           0x14, 0, { }},
 
-#define OSM_CP_COM( )                   \
-({                                      \
-    switch(com_code)                    \
-    {                                   \
-    case OSM_CP_CODE:                   \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
-        cp_res = REG[Rd] - REG[Rr];     \
-        break;                          \
-                                        \
-    case OSM_CP_STACK_CODE:             \
-        Stack_pop(STACK, &K);           \
-        Stack_pop(STACK, &k);           \
-        cp_res = K - k;                 \
-        Stack_push(STACK, k);           \
-        Stack_push(STACK, K);           \
-        break;                          \
-                                        \
-    default:                            \
-        printf("undefined COMP code");  \
-        return 1;                       \
-        break;                          \
-    }                                   \
+#define ASM_CP_COM( )                       \
+({                                          \
+    switch(com_code)                        \
+    {                                       \
+    case ASM_CP_CODE:                       \
+        ASM_GET(Rd);                        \
+        ASM_GET(Rr);                        \
+        cp_res = REG[Rd] - REG[Rr];         \
+        break;                              \
+                                            \
+    case ASM_CP_STACK_CODE:                 \
+        Stack_pop(STACK, &K);               \
+        Stack_pop(STACK, &k);               \
+        cp_res = K - k;                     \
+        Stack_push(STACK, k);               \
+        Stack_push(STACK, K);               \
+        break;                              \
+                                            \
+    default:                                \
+        printf("\nundefined COMP code");    \
+        return 1;                           \
+        break;                              \
+    }                                       \
 })
 
 //====================================================
 
-#define OSM_BREQ_CODE (0x15)
+#define ASM_BREQ_CODE (0x15)
 {          "BREQ",     0x15, 1, {LABEL_t}},
 
-#define OSM_BREQ_COM( ) \
+#define ASM_BREQ_COM( ) \
 ({                      \
-    OSM_GET(K);         \
+    ASM_GET(K);         \
     if(cp_res == 0)     \
         PC = PC0 + K;   \
 })
 
 //====================================================
 
-#define OSM_BRNE_CODE (0x16)
+#define ASM_BRNE_CODE (0x16)
 {          "BRNE",     0x16, 1, {LABEL_t}},
 
-#define OSM_BRNE_COM( ) \
+#define ASM_BRNE_COM( ) \
 ({                      \
-    OSM_GET(K);         \
+    ASM_GET(K);         \
     if(cp_res != 0)     \
         PC = PC0 + K;   \
 })
 
 //====================================================
 
-#define OSM_BRPL_CODE (0x17)
+#define ASM_BRPL_CODE (0x17)
 {          "BRPL",     0x17, 1, {LABEL_t}},
 
-#define OSM_BRPL_COM( ) \
+#define ASM_BRPL_COM( ) \
 ({                      \
-    OSM_GET(K);         \
+    ASM_GET(K);         \
     if(cp_res > 0)      \
         PC = PC0 + K;   \
 })
 
 //====================================================
 
-#define OSM_BRMI_CODE (0x18)
+#define ASM_BRMI_CODE (0x18)
 {          "BRMI",     0x18, 1, {LABEL_t}},
 
-#define OSM_BRMI_COM( ) \
+#define ASM_BRMI_COM( ) \
 ({                      \
-    OSM_GET(K);         \
+    ASM_GET(K);         \
     if(cp_res < 0)      \
         PC = PC0 + K;   \
 })
@@ -333,131 +349,131 @@ const struct OSM_COM OSM_COMANDS[] = {
 //-------------------DATA-TRANSFER-INSTRUCTIONS------------------------
 //=====================================================================
 
-#define OSM_MOV_CODE (0x31)
+#define ASM_MOV_CODE (0x31)
 {          "MOV",     0x31, 2, {REG_t, REG_t}},
 
-#define OSM_MOV_COM( ) \
+#define ASM_MOV_COM( ) \
 ({                     \
-    OSM_GET(Rd);       \
-    OSM_GET(Rr);       \
+    ASM_GET(Rd);       \
+    ASM_GET(Rr);       \
     REG[Rd] = REG[Rr]; \
 })
 
 //====================================================
 
-#define OSM_LDI_CODE (0x32)
+#define ASM_LDI_CODE (0x32)
 {          "LDI",     0x32, 2, {REG_t, NUM_t}}, // LoaD Immediate
 
-#define OSM_LD_CODE  (0x33)
+#define ASM_LD_CODE  (0x33)
 {          "LD",      0x33, 2, {REG_t, S_REG_t}}, // LoaD  indirect (from SRAM)
 
-#define OSM_LDD_CODE (0x34)
+#define ASM_LDD_CODE (0x34)
 {          "LDD",     0x34, 3, {REG_t, S_REG_t, S_NUM_t}}, // LoaD indirect with Displacement (from SRAM)
 
-#define OSM_LDS_CODE (0x35)
+#define ASM_LDS_CODE (0x35)
 {          "LDS",     0x35, 2, {REG_t, S_NUM_t}}, // LoaD direct (from SRAM)
 
-#define OSM_LD_COM( )                   \
-({                                      \
-    switch(com_code)                    \
-    {                                   \
-    case OSM_LDI_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(K);                     \
-        REG[Rd] = K;                    \
-        break;                          \
-                                        \
-    case OSM_LD_CODE:                   \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
-        REG[Rd] = SRAM[REG[Rr]];        \
-        break;                          \
-                                        \
-    case OSM_LDD_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
-        OSM_GET(k);                     \
-        REG[Rd] = SRAM[REG[Rr] + k];    \
-        break;                          \
-                                        \
-    case OSM_LDS_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(k);                     \
-        REG[Rd] = SRAM[k];              \
-        break;                          \
-                                        \
-    default:                            \
-        printf("undefined LOAD code");  \
-        return 1;                       \
-        break;                          \
-    }                                   \
+#define ASM_LD_COM( )                       \
+({                                          \
+    switch(com_code)                        \
+    {                                       \
+    case ASM_LDI_CODE:                      \
+        ASM_GET(Rd);                        \
+        ASM_GET(K);                         \
+        REG[Rd] = K;                        \
+        break;                              \
+                                            \
+    case ASM_LD_CODE:                       \
+        ASM_GET(Rd);                        \
+        ASM_GET(Rr);                        \
+        REG[Rd] = SRAM[REG[Rr]];            \
+        break;                              \
+                                            \
+    case ASM_LDD_CODE:                      \
+        ASM_GET(Rd);                        \
+        ASM_GET(Rr);                        \
+        ASM_GET(k);                         \
+        REG[Rd] = SRAM[REG[Rr] + k];        \
+        break;                              \
+                                            \
+    case ASM_LDS_CODE:                      \
+        ASM_GET(Rd);                        \
+        ASM_GET(k);                         \
+        REG[Rd] = SRAM[k];                  \
+        break;                              \
+                                            \
+    default:                                \
+        printf("\nundefined LOAD code");    \
+        return 1;                           \
+        break;                              \
+    }                                       \
 })
 
 //====================================================
 
-#define OSM_ST_CODE  (0x36)
+#define ASM_ST_CODE  (0x36)
 {          "ST",      0x36, 2, {S_REG_t, REG_t}}, // STore indirect (to SRAM)
 
-#define OSM_STD_CODE (0x37)
+#define ASM_STD_CODE (0x37)
 {          "STD",     0x37, 3, {S_REG_t, S_NUM_t, REG_t}}, // STore indirect with Displacement (to SRAM)
 
-#define OSM_STS_CODE (0x38)
+#define ASM_STS_CODE (0x38)
 {          "STS",     0x38, 2, {S_NUM_t, REG_t}}, // STore direct (to SRAM)
 
-#define OSM_ST_COM( )                   \
-({                                      \
-    switch(com_code)                    \
-    {                                   \
-    case OSM_ST_CODE:                   \
-        OSM_GET(Rd);                    \
-        OSM_GET(Rr);                    \
-        SRAM[REG[Rd]] = REG[Rr];        \
-        break;                          \
-                                        \
-    case OSM_STD_CODE:                  \
-        OSM_GET(Rd);                    \
-        OSM_GET(k);                     \
-        OSM_GET(Rr);                    \
-        SRAM[REG[Rd] + k] = REG[Rr];    \
-        break;                          \
-                                        \
-    case OSM_STS_CODE:                  \
-        OSM_GET(k);                     \
-        OSM_GET(Rr);                    \
-        SRAM[k] = REG[Rr];              \
-        break;                          \
-                                        \
-    default:                            \
-        printf("undefined STORE code"); \
-        return 1;                       \
-        break;                          \
-    }                                   \
+#define ASM_ST_COM( )                       \
+({                                          \
+    switch(com_code)                        \
+    {                                       \
+    case ASM_ST_CODE:                       \
+        ASM_GET(Rd);                        \
+        ASM_GET(Rr);                        \
+        SRAM[REG[Rd]] = REG[Rr];            \
+        break;                              \
+                                            \
+    case ASM_STD_CODE:                      \
+        ASM_GET(Rd);                        \
+        ASM_GET(k);                         \
+        ASM_GET(Rr);                        \
+        SRAM[REG[Rd] + k] = REG[Rr];        \
+        break;                              \
+                                            \
+    case ASM_STS_CODE:                      \
+        ASM_GET(k);                         \
+        ASM_GET(Rr);                        \
+        SRAM[k] = REG[Rr];                  \
+        break;                              \
+                                            \
+    default:                                \
+        printf("\nundefined STORE code");   \
+        return 1;                           \
+        break;                              \
+    }                                       \
 })
 
 //====================================================
 
-#define OSM_IN_CODE       (0x39)
+#define ASM_IN_CODE       (0x39)
 {          "IN",           0x39, 1, {REG_t}},
 
-#define OSM_IN_STACK_CODE (0x3F)
+#define ASM_IN_STACK_CODE (0x3F)
 {          "IN",           0x3F, 0, { }},
 
-#define OSM_IN_COM( )                   \
+#define ASM_IN_COM( )                   \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_IN_CODE:                   \
-        OSM_GET(Rd);                    \
+    case ASM_IN_CODE:                   \
+        ASM_GET(Rd);                    \
         scanf("%i", REG + Rd);          \
         break;                          \
                                         \
-    case OSM_IN_STACK_CODE:             \
+    case ASM_IN_STACK_CODE:             \
         scanf("%i", &K);                \
         Stack_push(STACK, K);           \
         break;                          \
                                         \
     default:                            \
-        printf("undefined IN code");    \
+        printf("\nundefined IN code");  \
         return 1;                       \
         break;                          \
     }                                   \
@@ -465,28 +481,28 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_OUT_CODE (0x3A)
+#define ASM_OUT_CODE (0x3A)
 {          "OUT",     0x3A, 1, {REG_t}},
 
-#define OSM_OUT_STACK_CODE (0x3E)
+#define ASM_OUT_STACK_CODE (0x3E)
 {          "OUT",           0x3E, 0, { }},
 
-#define OSM_OUT_COM( )                  \
+#define ASM_OUT_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_OUT_CODE:              \
-        OSM_GET(Rr);                    \
+    case ASM_OUT_CODE:                  \
+        ASM_GET(Rr);                    \
         printf("\n%i", REG[Rr]);        \
         break;                          \
                                         \
-    case OSM_OUT_STACK_CODE:            \
+    case ASM_OUT_STACK_CODE:            \
         Stack_pop(STACK, &K);           \
         printf("\n%i", K);              \
         break;                          \
                                         \
     default:                            \
-        printf("undefined OUT code");   \
+        printf("\nundefined OUT code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -494,53 +510,53 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_PUSH_CODE (0x41)
+#define ASM_PUSH_CODE (0x41)
 {          "PUSH",     0x41, 1, {REG_t}},
 
-#define OSM_PUSH_STACK_NUM_CODE        (0x4A)
+#define ASM_PUSH_STACK_NUM_CODE        (0x4A)
 {          "PUSH",                      0x4A, 1, {NUM_t}},
 
-#define OSM_PUSH_STACK_S_N_CODE        (0x4B)
+#define ASM_PUSH_STACK_S_N_CODE        (0x4B)
 {          "PUSH",                      0x4B, 1, {S_NUM_t}},
 
-#define OSM_PUSH_STACK_S_R_CODE        (0x4C)
+#define ASM_PUSH_STACK_S_R_CODE        (0x4C)
 {          "PUSH",                      0x4C, 1, {S_REG_t}},
 
-#define OSM_PUSH_STACK_S_R_PLUS_N_CODE (0x4D)
+#define ASM_PUSH_STACK_S_R_PLUS_N_CODE (0x4D)
 {          "PUSH",                      0x4D, 2, {S_REG_t, S_NUM_t}},
 
-#define OSM_PUSH_COM( )                         \
+#define ASM_PUSH_COM( )                         \
 ({                                              \
     switch(com_code)                            \
     {                                           \
-    case OSM_PUSH_CODE:                         \
-        OSM_GET(Rr);                            \
+    case ASM_PUSH_CODE:                         \
+        ASM_GET(Rr);                            \
         Stack_push(STACK, REG[Rr]);             \
         break;                                  \
                                                 \
-    case OSM_PUSH_STACK_NUM_CODE:               \
-        OSM_GET(K);                             \
+    case ASM_PUSH_STACK_NUM_CODE:               \
+        ASM_GET(K);                             \
         Stack_push(STACK, K);                   \
         break;                                  \
                                                 \
-    case OSM_PUSH_STACK_S_N_CODE:               \
-        OSM_GET(k);                             \
+    case ASM_PUSH_STACK_S_N_CODE:               \
+        ASM_GET(k);                             \
         Stack_push(STACK, SRAM[k]);             \
         break;                                  \
                                                 \
-    case OSM_PUSH_STACK_S_R_CODE:               \
-        OSM_GET(Rr);                            \
+    case ASM_PUSH_STACK_S_R_CODE:               \
+        ASM_GET(Rr);                            \
         Stack_push(STACK, SRAM[REG[Rr]]);       \
         break;                                  \
                                                 \
-    case OSM_PUSH_STACK_S_R_PLUS_N_CODE:        \
-        OSM_GET(Rr);                            \
-        OSM_GET(k);                             \
+    case ASM_PUSH_STACK_S_R_PLUS_N_CODE:        \
+        ASM_GET(Rr);                            \
+        ASM_GET(k);                             \
         Stack_push(STACK, SRAM[REG[Rr] + k]);   \
         break;                                  \
                                                 \
     default:                                    \
-        printf("undefined PUSH code");          \
+        printf("\nundefined PUSH code");        \
         return 1;                               \
         break;                                  \
     }                                           \
@@ -548,27 +564,27 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //====================================================
 
-#define OSM_POP_CODE       (0x42)
+#define ASM_POP_CODE       (0x42)
 {          "POP",           0x42, 1, {REG_t}},
 
-#define OSM_POP_STACK_CODE (0x4E)
+#define ASM_POP_STACK_CODE (0x4E)
 {          "POP",           0x4E, 0, { }},
 
-#define OSM_POP_COM( )                  \
+#define ASM_POP_COM( )                  \
 ({                                      \
     switch(com_code)                    \
     {                                   \
-    case OSM_POP_CODE:                  \
-        OSM_GET(Rd);                    \
+    case ASM_POP_CODE:                  \
+        ASM_GET(Rd);                    \
         Stack_pop(STACK, REG + Rd);     \
         break;                          \
                                         \
-    case OSM_POP_STACK_CODE:            \
+    case ASM_POP_STACK_CODE:            \
         Stack_pop(STACK, &K);           \
         break;                          \
                                         \
     default:                            \
-        printf("\nundefined POP code");   \
+        printf("\nundefined POP code"); \
         return 1;                       \
         break;                          \
     }                                   \
@@ -579,20 +595,20 @@ const struct OSM_COM OSM_COMANDS[] = {
 //-------------------MCU-CONTROL-INSTRUCTIONS--------------------------
 //=====================================================================
 
-#define OSM_NOP_CODE (0xF0)
+#define ASM_NOP_CODE (0xF0)
 {          "NOP",     0xF0, 0, { }},
 
-#define OSM_NOP_COM( ) \
+#define ASM_NOP_COM( ) \
 ({                     \
                        \
 })
 
 //====================================================
 
-#define OSM_END_CODE (0xFF)
+#define ASM_END_CODE (0xFF)
 {          "END",     0xFF, 0, { }}
 
-#define OSM_END_COM( ) \
+#define ASM_END_COM( ) \
 ({                     \
     processing = 0;    \
 })
@@ -600,210 +616,130 @@ const struct OSM_COM OSM_COMANDS[] = {
 
 //=====================================================================
 
-#define OSM_GET( var ) ({var = *PC++; printf("\t(%s is %d)", #var, var);})
+/** \brief Prints given type of an argument (according to asm_commands.h)
+ *
+ * \param argtype int [in] - type of some argument
+ *
+ */
+void print_arg_type(int argtype);
 
 
-int process(int* PC0)
+/** \brief Prints given argument with its type (according to asm_commands.h)
+ *
+ * \param argtype int [in] - type of given argument
+ * \param arg int [in] - the argument to print
+ *
+ */
+void print_arg(int argtype, int arg);
+
+
+/** \brief Writes a full description on given ASM_ command
+ *
+ * \param command struct ASM_COM [in] - command to describe
+ *
+ */
+void print_command_info(struct ASM_COM command);
+
+
+/** \brief Writes description on all included functions
+ *
+ */
+void print_assembler_info();
+
+
+//=====================================================================
+
+void print_arg_type(int argtype)
 {
-    int REG[REG_CAPACITY];
-    int SRAM[SRAM_CAPACITY];
-
-    struct Stack STACK_ = {};
-    Stack_construct(STACK_);
-    struct Stack* STACK = &STACK_;
-
-    struct Stack CALL_STACK_ = {};
-    Stack_construct(CALL_STACK_);
-    struct Stack* CALL_STACK = &CALL_STACK_;
-
-    int* PC = PC0;
-    int Rd = 0, Rr = 0, K = 0, k = 0, cp_res = 0;
-    int processing = 1;
-    while(processing)
+    switch(argtype)
     {
-        int com_code = *PC++;
-        printf("0x%02X is ", com_code);
-        switch(com_code)
-        {
-        case OSM_ADD_CODE:
-        case OSM_ADD_STACK_CODE:
-            printf("ADD");
-            OSM_ADD_COM();
-            break;
+    case UNKNOWN_t:
+        printf(RED"UNKNOWN"RESET);
+        break;
 
-        case OSM_SUB_CODE:
-        case OSM_SUB_STACK_CODE:
-            printf("SUB");
-            OSM_SUB_COM();
-            break;
+    case NUM_t:
+        printf("const");
+        break;
 
+    case REG_t:
+        printf("register");
+        break;
 
+    case S_NUM_t:
+        printf("const(SRAM pos)");
+        break;
 
-        case OSM_INC_CODE:
-            printf("INC");
-            OSM_INC_COM();
-            break;
+    case S_REG_t:
+        printf("register(SRAM pos)");
+        break;
 
-        case OSM_DEC_CODE:
-            printf("DEC");
-            OSM_DEC_COM();
-            break;
-
-        case OSM_CLR_CODE:
-            printf("CLR");
-            OSM_CLR_COM();
-            break;
-
-        case OSM_SER_CODE:
-            printf("SER");
-            OSM_SER_COM();
-            break;
-
-
-
-        case OSM_MUL_CODE:
-        case OSM_MUL_STACK_CODE:
-            printf("MUL");
-            OSM_MUL_COM();
-            break;
-
-        case OSM_DIV_CODE:
-        case OSM_DIV_STACK_CODE:
-            printf("DIV");
-            OSM_DIV_COM();
-            break;
-
-
-
-        case OSM_RET_CODE:
-            printf("RET");
-            OSM_RET_COM();
-            break;
-
-        case OSM_JMP_CODE:
-            printf("JMP");
-            OSM_JMP_COM();
-            break;
-
-        case OSM_CALL_CODE:
-            printf("CALL");
-            OSM_CALL_COM();
-            break;
-
-
-
-        case OSM_CP_CODE:
-        case OSM_CP_STACK_CODE:
-            printf("COMP");
-            OSM_CP_COM();
-            break;
-
-
-
-        case OSM_BREQ_CODE:
-            printf("BREQ");
-            OSM_BREQ_COM();
-            break;
-
-        case OSM_BRNE_CODE:
-            printf("BRNE");
-            OSM_BRNE_COM();
-            break;
-
-        case OSM_BRPL_CODE:
-            printf("BRPL");
-            OSM_BRPL_COM();
-            break;
-
-        case OSM_BRMI_CODE:
-            printf("BRMI");
-            OSM_BRMI_COM();
-            break;
-
-
-
-        case OSM_MOV_CODE:
-            printf("MOV");
-            OSM_MOV_COM();
-            break;
-
-
-
-        case OSM_LDI_CODE:
-        case OSM_LD_CODE:
-        case OSM_LDD_CODE:
-        case OSM_LDS_CODE:
-            printf("LOAD");
-            OSM_LD_COM();
-            break;
-
-
-
-        case OSM_ST_CODE:
-        case OSM_STD_CODE:
-        case OSM_STS_CODE:
-            printf("STORE");
-            OSM_ST_COM();
-            break;
-
-
-
-        case OSM_IN_CODE:
-        case OSM_IN_STACK_CODE:
-            printf("IN");
-            OSM_IN_COM();
-            break;
-
-
-
-        case OSM_OUT_CODE:
-        case OSM_OUT_STACK_CODE:
-            printf("OUT");
-            OSM_OUT_COM();
-            break;
-
-
-
-        case OSM_PUSH_CODE:
-        case OSM_PUSH_STACK_NUM_CODE:
-        case OSM_PUSH_STACK_S_N_CODE:
-        case OSM_PUSH_STACK_S_R_CODE:
-        case OSM_PUSH_STACK_S_R_PLUS_N_CODE:
-            printf("PUSH");
-            OSM_PUSH_COM();
-            break;
-
-
-
-        case OSM_POP_CODE:
-        case OSM_POP_STACK_CODE:
-            printf("POP");
-            OSM_POP_COM();
-            break;
-
-
-
-        case OSM_NOP_CODE:
-            printf("NOP");
-            OSM_NOP_COM();
-            break;
-
-        case OSM_END_CODE:
-            printf("END\n");
-            OSM_END_COM();
-            break;
-
-        default:
-            printf(RED ALERT"AN UNDEFINED COMMAND CODE"RESET);
-            processing = 0;
-            break;
-        }
-        printf("\n");
-
+    case LABEL_t:
+        printf("label");
+        break;
     }
-    Stack_destruct(STACK);
-    Stack_destruct(CALL_STACK);
-    return 0;
+    return;
+}
+
+void print_arg(int argtype, int arg)
+{
+    switch(argtype)
+    {
+    case UNKNOWN_t:
+        printf(RED"UNKNOWN (%d)"RESET, arg);
+        break;
+
+    case NUM_t:
+        printf("const %d", arg);
+        break;
+
+    case REG_t:
+        printf("register R%d", arg);
+        break;
+
+    case S_NUM_t:
+        printf("const %d (SRAM pos)", arg);
+        break;
+
+    case S_REG_t:
+        printf("register R%d SRAM pos", arg);
+        break;
+
+    case LABEL_t:
+        printf("label #%d", arg);
+        break;
+    }
+    return;
+}
+
+void print_command_info(struct ASM_COM command)
+{
+    printf(UNDERLINE"COMMAND\n"RESET"\t%s (0x%02X)\n", command.name, command.code);
+    if(!command.argc)
+    {
+        printf("\n");
+        return;
+    }
+
+    printf("\t{\n");
+    for(int i = 0; i < command.argc; ++i)
+    {
+        printf("\t\t%d) ", i + 1);
+        print_arg_type(command.argtypes[i]);
+        printf("\n");
+    }
+    printf("}\n\n");
+    return;
+}
+
+void print_assembler_info()
+{
+    int i = 0;
+
+    while(ASM_COMMANDS[i].code != 0xFF)
+        print_command_info(ASM_COMMANDS[i++]);
+    print_command_info(ASM_COMMANDS[i]);
+
+    return;
 }
 
 
