@@ -24,7 +24,6 @@ struct Label
     int pos;
     char name[MAX_STR_LEN];
 } Labels[MAX_LBL_NUM];
-
 int num_of_labels;
 
 struct Variable
@@ -35,6 +34,8 @@ struct Variable
 } Variables[MAX_VAR_NUM];
 int num_of_variables;
 
+int assembling;
+
 char* skip_space(char* line)
 {
     while(isspace(*line))
@@ -42,9 +43,9 @@ char* skip_space(char* line)
     return line;
 }
 
-char* skip_alnum(char* line)
+char* skip_alnum_and_(char* line)
 {
-    while(isalnum(*line))
+    while(isalnum(*line) || *line == '_')
         line++;
     return line;
 }
@@ -106,7 +107,10 @@ void get_arg(char* line, int* arg, int* argtype)
             return;
         }
 
-    printf(RED ALERT"\tUNKNOWN TYPE OF %s\n"RESET, name);
+    if(assembling == 1)
+        *argtype = LABEL_t;
+    else
+        printf(RED ALERT"\tUNKNOWN TYPE OF %s\n"RESET, name);
     return;
 }
 
@@ -121,7 +125,18 @@ void load_argv(char* line, int* argc_out, int* argv, int* argtypes)
             line = skip_space(line + 1); // to argument
 
             get_arg(line, argv + argc, argtypes + argc);
-            line = skip_alnum(line); // skipping argument
+            line = skip_alnum_and_(line); // skipping argument
+
+            switch(argtypes[argc])
+            {
+            case NUM_t:
+                argtypes[argc] = S_NUM_t;
+                break;
+
+            case REG_t:
+                argtypes[argc] = S_REG_t;
+                break;
+            }
 
             line = skip_space(line); // to + or ]
             if(*line == '+')
@@ -130,20 +145,31 @@ void load_argv(char* line, int* argc_out, int* argv, int* argtypes)
                 line = skip_space(line + 1); // to argument
 
                 get_arg(line, argv + argc, argtypes + argc);
-                line = skip_alnum(line); // skipping argument
+                line = skip_alnum_and_(line); // skipping argument
+
+                switch(argtypes[argc])
+                {
+                case NUM_t:
+                    argtypes[argc] = S_NUM_t;
+                    break;
+
+                case REG_t:
+                    argtypes[argc] = S_REG_t;
+                    break;
+                }
 
                 line = skip_space(line); // to ]
             }
             line++; // skipping ]
         }
-        else if(isalnum(*line))
+        else if(isalnum(*line) || *line == '_')
         {
             get_arg(line, argv + argc, argtypes + argc);
-            line = skip_alnum(line); // skipping argument
+            line = skip_alnum_and_(line); // skipping argument
         }
         else
         {
-            printf(RED ALERT"UNKNOWN ARGUMENT TYPE\n"RESET);
+            printf(RED ALERT"\tUNKNOWN ARGUMENT TYPE\n"RESET);
             return;
         }
         argc++;
@@ -173,6 +199,14 @@ void print_arg_type(int argtype)
         printf("register");
         break;
 
+    case S_NUM_t:
+        printf("const(SRAM pos)");
+        break;
+
+    case S_REG_t:
+        printf("register(SRAM pos)");
+        break;
+
     case LABEL_t:
         printf("label");
         break;
@@ -191,6 +225,15 @@ void print_arg(int argtype, int arg)
     case REG_t:
         printf("register R%d", arg);
         break;
+
+    case S_NUM_t:
+        printf("const %d (SRAM pos)", arg);
+        break;
+
+    case S_REG_t:
+        printf("register R%d SRAM pos", arg);
+        break;
+
 
     case LABEL_t:
         printf("label #%d", arg);
@@ -248,7 +291,7 @@ int interprete(char* line, int* byte_num, int* code)
     }
 
 
-    line = skip_alnum(line);
+    line = skip_alnum_and_(line);
     line = skip_space(line);
 
     int argv[100], argtypes[100], argc = 0;
@@ -359,6 +402,7 @@ int assemble(char** prog_arr, int num_of_lines, int* code, int* byte_num)
     int last_byte_num = 0;
     num_of_labels = 0;
     num_of_variables = 0;
+    assembling = 1;
 
     for(int i = 0; i < num_of_lines; ++i)
     {
@@ -370,16 +414,17 @@ int assemble(char** prog_arr, int num_of_lines, int* code, int* byte_num)
             printf(BLUE"==--%d bytes used--==\n"RESET, last_byte_num);
         }
     }
-    printf("first assembling: [  "GREEN"OK"RESET"  ]\n");
+    printf("First assembling: [  "GREEN"OK"RESET"  ]\n");
 
     printf("\n================"UNDERLINE"SECOND ASSEMBLING"RESET"================\n");
 
     *byte_num = 0;
+    assembling = 2;
 
     for(int i = 0; i < num_of_lines; ++i)
         if(interprete(prog_arr[i], byte_num, code + *byte_num))
             return 1;
-    printf("second assembling: [  "GREEN"OK"RESET"  ]\n");
+    printf("Second assembling: [  "GREEN"OK"RESET"  ]\n");
 
     return 0;
 }
@@ -446,7 +491,7 @@ int main()
 
     int num_of_lines = 0;
 
-    char* program = fgetfile("./../input.txt", &num_of_lines);
+    char* program = fgetfile("./../linear_solver2.txt", &num_of_lines);
     if(!program)
         return 1;
 
@@ -475,7 +520,7 @@ int main()
     Variables_dump();
     print_code(code, byte_count, 7);
 
-    //**
+    //** Uploading to binary file
 
     upload_code("./../code2_b", code, byte_count);
 

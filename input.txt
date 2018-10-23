@@ -1,10 +1,37 @@
-        SER R1
-        SER R2
-        LDI R1, 22
-        STD [ R1 + 3 ], R1
-begin :
-        LDS R2, [25]
-        OUT R2
-        ME 1
-        YOU R0
+        first_register R1
+        null_register R0
+        LDI null_register, 0
+        NULL 0
+        
+my_f1rst_prog:
+        
+        SER first_register
+        SER null_register
+        
+        INC null_register
+        DEC null_register
+        OUT null_register                   ; 0
+        CLR null_register
+        
+        LDI R1, 1
+        STD [R1+1], R1
+        LDS r2   , [ 2            ]
+OUT R2                                      ; 1
+    
+    
+        I r2
+        IN
+        check r5
+        two r20
+        LDI r20, 2
+    loop:       
+        MUL I, two
+        
+        POP check
+        PUSH check
+        CP I, check
+        BRMI loop
+        OUT I                               ; 2 <= 2 ^ n > check
+        
+        
         END

@@ -1,29 +1,50 @@
-        IN R1       ;   enter a
-        IN R2       ;   enter b
-        CALL lnsolve:
+        tmp R0
+        
+        LDI tmp, 1
+        minus_1 R31
+        SUB minus_1, tmp
+        
+        infinity_roots R30
+        MOV infinity_roots, minus_1
+        
+        a R1
+        IN a
+        
+        b R2
+        IN b
+        
+        CALL line_solve
         END
 
-lnsolve:
-        LDI R0, 0   ;   tmp = 0
-        CP R1, R0 
-        BRNE anot0:
-ais0:               ;   if a == 0
-        CP R2, R0
-        BRNE bnot0:  
-bis0:               ;       if b == 0
-        LDI R3, 1
-        SUB R0, R3
-        OUT R0      ;           print -1 // infinity roots
-        RET
-bnot0:              ;       else
-        OUT R0      ;           print 0 // no roots
-        RET
-        JMP aexit:
-anot0:              ;   else
-        DIV R2, R1
-        SUB R0, R2
-        MOV R1, R0  ;       root = -b / a
-        LDI R0, 1   
-        OUT R0      ;       print 1 // one root
-        OUT R1      ;       print root
+line_solve:
+        tmp R0
+        LDI tmp, 0
+        
+        num_of_roots R3
+        x R4
+        
+        CP a, tmp
+        BRNE a_is_not_0
+            ; a == 0
+            CP b, tmp
+            BRNE b_is_not_0
+                ; b == 0
+                MOV num_of_roots, infinity_roots
+                OUT num_of_roots
+                RET
+b_is_not_0:
+            LDI num_of_roots, 0
+            OUT num_of_roots
+            RET
+a_is_not_0:
+        PUSH a
+        PUSH b
+        DIV
+        PUSH minus_1
+        MUL
+        POP x
+        
+        LDI num_of_roots, 1
+        OUT num_of_roots
+        OUT x
         RET
