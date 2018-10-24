@@ -8,13 +8,12 @@
 
 int main()
 {
-    print_assembler_info();
-    return 0;
     // Reading code from binary file
-    size_t code_len;
-    int* code = loadcode("./../code2_b", &code_len);
 
-    //*ECHO*//
+    size_t code_len;
+    int* code = loadcode("./../code_b", &code_len);
+
+    //* ECHO *//
 
     print_code(code, code_len, 8);
     printf("\n");

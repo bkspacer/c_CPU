@@ -153,8 +153,7 @@ int Stack_OK(const struct Stack* this)
     if(this->print_format[1] == '%')
         return 0;
 
-    if(this->hash_sum != Stack_hash(this))
-        return 0;
+    //if(this->hash_sum != Stack_hash(this))return 0;
 
     for(int i = 0; i < LEN_OF_CANARY; ++i)
         if(this->data[i] != this->canary[i] || this->data[this->capacity + 2 * LEN_OF_CANARY - 1 - i] != this->canary[i])

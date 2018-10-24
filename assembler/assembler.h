@@ -154,7 +154,7 @@ char* skip_space_and_comma(char* line);
  * \param argtype int* [out] - the type of the argument which has been read out
  *
  */
-void get_arg(char* line, int* arg, int* argtype);
+int get_arg(char* line, int* arg, int* argtype);
 
 
 /** \brief Interprets given line as argument and calculates all of them
@@ -165,7 +165,7 @@ void get_arg(char* line, int* arg, int* argtype);
  * \param argtypes int* [out] - types of the arguments that have been read out
  *
  */
-void load_argv(char* line, int* argc, int* argv, int* argtypes);
+int load_argv(char* line, int* argc, int* argv, int* argtypes);
 
 
 /** \brief Interprets given string as a line of an assembler program (according to asm_commands.h), converts it to binary code and adds to given code line

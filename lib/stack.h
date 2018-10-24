@@ -21,6 +21,7 @@
 
 #define ECHO_STR( var )         (printf("%s = \"%s\"", strchr(#var, '>') + 1, var))
 #define ECHO_INT( var )         (printf("%s = %d"    , strchr(#var, '>') + 1, var))
+#define ECHO_DBL( var )         (printf("%s = %f"    , strchr(#var, '>') + 1, var))
 #define ECHO_VAR( var, format) ({printf("%s = "      , strchr(#var, '>') + 1     ); \
                                  printf(      format                        , var);})
 
@@ -34,7 +35,7 @@
 #endif
 
 
-typedef int stack_val_type;/**< Type of items in stack, may be changed to char/int/double in the code file*/
+typedef double stack_val_type;/**< Type of items in stack, may be changed to char/int/double in the code file*/
 
 /** \brief Realization of stack as a structure
  *

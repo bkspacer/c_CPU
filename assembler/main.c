@@ -32,22 +32,25 @@ int main()
     int* code = (int*) calloc(3 * num_of_lines, sizeof(int)); // There are no functions that need more than 3 arguments
     int byte_count;
 
-    assemble(prog_arr, num_of_lines, code, &byte_count);
+    int result = assemble(prog_arr, num_of_lines, code, &byte_count);
 
     //**
 
     Labels_dump();
     Variables_dump();
-    print_code(code, byte_count, 7);
+    if(!result)
+        print_code(code, byte_count, 7);
 
     //** Uploading to binary file
 
-    upload_code("./../code_b", code, byte_count);
-
+    if(!result)
+        upload_code("./../code_b", code, byte_count);
+    else
+        printf(RED ALERT"FATAL ERROR"RESET);
     //**
 
     DELETE(code);
     DELETE(program);
     DELETE(prog_arr);
-    return 0;
+    return result;
 }

@@ -1,0 +1,46 @@
+# depslib dependency file v1.0
+1540396269 source:/home/oleg/code_blocks_projects/c_CPU/lib/stack.c
+	"stack.h"
+
+1540387398 /home/oleg/code_blocks_projects/c_CPU/lib/stack.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+
+1539792711 source:/home/oleg/code_blocks_projects/c_CPU/lib/strings_int.c
+	"strings_int.h"
+
+1539289522 /home/oleg/code_blocks_projects/c_CPU/lib/strings_int.h
+	<stdio.h>
+	<stdlib.h>
+	<sys/stat.h>
+	<assert.h>
+	<ctype.h>
+
+1540420446 source:/home/oleg/code_blocks_projects/c_CPU/assembler/assembler.c
+	"assembler.h"
+	"./../lib/osm_comands.h"
+	"../lib/asm_commands.h"
+
+1540418781 /home/oleg/code_blocks_projects/c_CPU/assembler/assembler.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"./../lib/strings_int.h"
+
+1540394700 /home/oleg/code_blocks_projects/c_CPU/lib/osm_comands.h
+	"../lib/stack.h"
+	"asm_commands.h"
+	"asm_commands.h"
+
+1540418527 source:/home/oleg/code_blocks_projects/c_CPU/assembler/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"assembler.h"
+
+1540419228 /home/oleg/code_blocks_projects/c_CPU/lib/asm_commands.h
+
+1540384074 /home/oleg/code_blocks_projects/c_CPU/assembler/commands.h
+

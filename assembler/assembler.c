@@ -14,7 +14,6 @@ int width(int n)
     return i;
 }
 
-
 void Labels_dump()
 {
     printf("\n========"UNDERLINE"PROGRAM LABELS"RESET"========\n");
@@ -26,7 +25,7 @@ void Labels_dump()
     }
 
     for(int i = 0; i < num_of_labels; ++i)
-        printf("\t%d) \"%s\" - byte #%d\n", i + 1, Labels[i].name, Labels[i].pos);
+        printf("\t%*d) \"%s\" - byte #%d\n", width(num_of_labels - 1), i + 1, Labels[i].name, Labels[i].pos);
 
     return;
 }
@@ -43,7 +42,7 @@ void Variables_dump()
 
     for(int i = 0; i < num_of_variables; ++i)
     {
-        printf("\t%d) \"%s\" - ", i + 1, Variables[i].name);
+        printf("\t%*d) \"%s\" - ", width(num_of_labels - 1), i + 1, Variables[i].name);
         print_arg(Variables[i].type, Variables[i].val);
         printf("\n");
     }
@@ -123,7 +122,7 @@ char* skip_space_and_comma(char* line)
 //----------------------MAIN-FUNCTIONS---------------------------------
 //=====================================================================
 
-void get_arg(char* line, int* arg, int* argtype)
+int get_arg(char* line, int* arg, int* argtype)
 {
     assert(line != NULL);
     assert(arg != NULL);
@@ -145,7 +144,7 @@ void get_arg(char* line, int* arg, int* argtype)
         {
             *argtype = LABEL_t;
             *arg = Labels[i].pos;
-            return;
+            return 0;
         }
 
     // if it is just a number
@@ -153,7 +152,7 @@ void get_arg(char* line, int* arg, int* argtype)
     {
         *argtype = NUM_t;
         *arg = atoi(name);
-        return;
+        return 0;
     }
 
     // if it is a register position
@@ -161,7 +160,7 @@ void get_arg(char* line, int* arg, int* argtype)
     {
         *argtype = REG_t;
         *arg = atoi(name + 1);
-        return;
+        return 0;
     }
 
     // if it is a variable
@@ -170,20 +169,24 @@ void get_arg(char* line, int* arg, int* argtype)
         {
             *argtype = Variables[i].type;
             *arg = Variables[i].val;
-            return;
+            return 0;
         }
 
     if(assembling == 1)
         // it may be OK
         *argtype = LABEL_t;
     else
+    {
         // it is definitely not OK
         printf(RED ALERT"\tUNKNOWN TYPE OF %s\n"RESET, name);
+        return 1;
+    }
 
-    return;
+
+    return 0;
 }
 
-void load_argv(char* line, int* argc, int* argv, int* argtypes)
+int load_argv(char* line, int* argc, int* argv, int* argtypes)
 {
     assert(line != NULL);
     assert(argc != NULL);
@@ -220,7 +223,8 @@ void load_argv(char* line, int* argc, int* argv, int* argtypes)
                 argc_++;
                 line = skip_space(line + 1); // to argument
 
-                get_arg(line, argv + argc_, argtypes + argc_);
+                if(get_arg(line, argv + argc_, argtypes + argc_))
+                    return 1;
                 line = skip_alnum_and_(line); // skipping argument
 
                 switch(argtypes[argc_])
@@ -241,14 +245,15 @@ void load_argv(char* line, int* argc, int* argv, int* argtypes)
         // a simple argument
         else if(isalnum(*line) || *line == '_')
         {
-            get_arg(line, argv + argc_, argtypes + argc_);
+            if(get_arg(line, argv + argc_, argtypes + argc_))
+                return 1;
             line = skip_alnum_and_(line); // skipping argument
         }
         // some weird symbol
         else
         {
             printf(RED ALERT"\tUNKNOWN ARGUMENT TYPE\n"RESET);
-            return;
+            return 1;
         }
 
         argc_++;
@@ -256,7 +261,7 @@ void load_argv(char* line, int* argc, int* argv, int* argtypes)
     }
 
     *argc = argc_;
-    return;
+    return 0;
 }
 
 int interprete(char* line, int* byte_num, int* code)
@@ -295,7 +300,7 @@ int interprete(char* line, int* byte_num, int* code)
         for(int i = 0; i < num_of_labels; ++i)
             if(!strcmp(com_name, Labels[i].name))
             {
-                if(*byte_num != Labels[i].pos)
+                if(!strcmp(Labels[i].name, com_name) && assembling == 1)
                 {
                     printf(RED ALERT"\tTHIS LABEL NAME IS ALREADY USED\n"RESET);
                     return 1;
@@ -322,7 +327,8 @@ int interprete(char* line, int* byte_num, int* code)
     line = skip_space(line); // skipping to first argument
 
     int argv[MAX_OF_ARGC], argtypes[MAX_OF_ARGC], argc = 0;
-    load_argv(line, &argc, argv, argtypes);
+    if(load_argv(line, &argc, argv, argtypes))
+        return 1;
 
     printf("Command %s with ", com_name);
     if(argc)
@@ -338,27 +344,25 @@ int interprete(char* line, int* byte_num, int* code)
     else
         printf("no arguments\n");
 
-
-    int com_pos = 0, command_found = 0;
-    while(ASM_COMMANDS[com_pos].code != 0xFF)
-    {
-        if(!strcmp(ASM_COMMANDS[com_pos].name, com_name))
-        {
-            command_found = 1;
-            if(ASM_COMMANDS[com_pos].argc == argc &&
-               equal_arrays(ASM_COMMANDS[com_pos].argtypes, argtypes, argc))
-                break;
-        }
-        com_pos++;
+    int command_found = 0;
+    #define DEF_CMD( name, byte, numofargs, instruction) \
+    {\
+        if(!strcmp(#name, com_name)) \
+        {\
+            printf("\tidentified as command %s (code 0x%02X)\n\t with ", #name, byte);\
+            *code++ = byte;\
+            ++*byte_num;\
+            command_found = 1;\
+        }\
     }
+    #include "../lib/asm_commands.h"
+    #undef DEF_CMD
 
-    // checking if the command is not actually END (0xFF)
-    if(strcmp(ASM_COMMANDS[com_pos].name, com_name) ||
-       !(ASM_COMMANDS[com_pos].argc == argc) ||
-       !equal_arrays(ASM_COMMANDS[com_pos].argtypes, argtypes, argc))
+    // checking if the command was not found
+    if(!command_found)
     {
         //if there is one argument, it may be a new variable
-        if(argc == 1 && !command_found)
+        if(argc == 1)
         {
             printf("\tidentified as a variable\n");
 
@@ -370,15 +374,25 @@ int interprete(char* line, int* byte_num, int* code)
 
             // checking if such variable already exists
             for(int i = 0; i < num_of_variables; ++i)
-                if(!strcmp(com_name, Variables[i].name))
+                if(!strcmp(Variables[i].name, com_name))
                 {
-                    if(Variables[i].type != argtypes[0] ||
-                       Variables[i].val != argv[0])
-                       {
-                           printf(RED ALERT"\tTHIS VARIABLE NAME IS ALREADY USED\n"RESET);
-                           return 1;
-                       }
+                    if(Variables[i].type != argtypes[0])
+                    {
+                        printf(RED ALERT"\tTHIS VARIABLE NAME IS ALREADY USED\n"RESET);
+                        return 1;
+                    }
+
                     return 0;
+                }
+                else
+                {
+                    if(Variables[i].type == argtypes[0] &&
+                       Variables[i].type == REG_t &&
+                       Variables[i].val == argv[0])
+                    {
+                        printf(RED ALERT"\tTHIS REGISTER VARIABLE IS ALREADY USED SOMEWHERE\n"RESET);
+                        return 1;
+                    }
                 }
 
                    Variables[num_of_variables].val  = argv[0];
@@ -394,30 +408,13 @@ int interprete(char* line, int* byte_num, int* code)
             return 0;
         }
 
-
-        if(command_found && argc == ASM_COMMANDS[com_pos].argc)
-        {
-            printf(RED ALERT"\tINCORRECT TYPES OF ARGUMENTS\n"RESET);
-            return 1;
-        }
-
-        if(command_found)
-        {
-            printf(RED ALERT"\tINCORRECT NUMBER OF ARGUMENTS\n"RESET);
-            return 1;
-        }
-
         printf(RED ALERT"\tCOMMAND NOT FOUND\n"RESET);
         return 1;
     }
 
     // so we have found the command
-    printf("\tidentified as command %s (code 0x%02X)\n\t with ", ASM_COMMANDS[com_pos].name, ASM_COMMANDS[com_pos].code);
 
-    *code++ = ASM_COMMANDS[com_pos].code;
-    ++*byte_num;
-
-    if(ASM_COMMANDS[com_pos].argc)
+    if(argc)
     {
         printf("%d arguments:\n", argc);
         for(int i = 0; i < argc; ++i)
@@ -454,7 +451,11 @@ int assemble(char** prog_arr, int num_of_lines, int* code, int* byte_num)
     for(int i = 0; i < num_of_lines; ++i)
     {
         if(interprete(prog_arr[i], byte_num, code + *byte_num))
+        {
+            printf("First assembling: ["RED"FAILED"RESET"]\n");
             return 1;
+        }
+
 
         if(last_byte_num != *byte_num)
         {
@@ -472,7 +473,10 @@ int assemble(char** prog_arr, int num_of_lines, int* code, int* byte_num)
 
     for(int i = 0; i < num_of_lines; ++i)
         if(interprete(prog_arr[i], byte_num, code + *byte_num))
+        {
+            printf("Second assembling: ["RED"FAILED"RESET"]\n");
             return 1;
+        }
 
     printf("Second assembling: [  "GREEN"OK"RESET"  ]\n");
 
