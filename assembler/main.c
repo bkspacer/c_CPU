@@ -41,7 +41,8 @@ int main()
 
     //** Assembling
 
-    int* code = (int*) calloc(3 * num_of_lines, sizeof(int)); // There are no functions that need more than 3 arguments
+    int* code = (int*) calloc(3 * num_of_lines, sizeof(int)); // There are no functions that need more than 3 arguments 
+                                                    /*For my mind, <3> shoul be defined as a constant*/
     int byte_count;
 
     int result = assemble(prog_arr, num_of_lines, code, &byte_count);
