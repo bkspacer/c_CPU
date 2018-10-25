@@ -6,11 +6,6 @@
 
 //====================================================
 
-DEF_CMD(dump,  0xF1, 2,
-{
-    Stack_dump(STACK);
-})
-
 DEF_CMD(ADD,  0x01, 2,
 {
     GET(Rd);
@@ -227,12 +222,10 @@ DEF_CMD(STS,  0x38, 2,
 DEF_CMD(IN,   0x39, 1,
 {
     GET(Rd);
-    printf("\n");
     scanf("%i", REG + Rd);
 })
 DEF_CMD(IN_STACK,   0x3F, 0,
 {
-    printf("\n");
     scanf("%lg", &st_1);
     PUSH_(st_1);
 })

@@ -1,17 +1,30 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+/** \file main.c
+ */
 #include "assembler.h"
+#include "../lib/strings_int.h"
 
 
 int main()
 {
-    //** Reading program
+    printf(BLUE"# Assembler\n"
+           "# (c) OlegZ 2018\n"RESET);
+
+    //**
+
+    char infilename[MAX_STR_LEN] = "../", actual_name[MAX_STR_LEN];
+
+    printf(UNDERLINE"\nENTER INPUT FILENAME\n"RESET"==>\t"BLUE);
+
+    scanf("%s", actual_name);
+    strcat(infilename, actual_name);
+
+    printf(RESET);
+
+    //**
 
     int num_of_lines = 0;
 
-    char* program = fgetfile("./../linear_solver2.txt", &num_of_lines);
+    char* program = fgetfile(infilename, &num_of_lines);
     if(!program)
         return 1;
 
@@ -24,8 +37,7 @@ int main()
 
     //**
 
-    printf(UNDERLINE"PROGRAMM FILE\n"RESET);
-    printtext(prog_arr, num_of_lines);
+    //printf(UNDERLINE"PROGRAMM FILE\n"RESET); printtext(prog_arr, num_of_lines);
 
     //** Assembling
 
@@ -42,11 +54,22 @@ int main()
         print_code(code, byte_count, 7);
 
     //** Uploading to binary file
+    char outfilename[MAX_STR_LEN] = "../";
+
+    printf(UNDERLINE"\nENTER OUTPUT FILENAME\n"RESET"==>\t"BLUE);
+
+    scanf("%s", actual_name);
+    strcat(outfilename, actual_name);
+
+    printf(RESET);
+
+    //**
 
     if(!result)
-        upload_code("./../code_b", code, byte_count);
+        upload_code(outfilename, code, byte_count);
     else
         printf(RED ALERT"FATAL ERROR"RESET);
+
     //**
 
     DELETE(code);

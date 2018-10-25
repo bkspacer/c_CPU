@@ -1,0 +1,205 @@
+;==========MAIN========================
+
+        zero    R0
+        a       R1
+        b       R2
+        c       R3
+        num_of_roots    R4
+        discriminant    R5
+        sign            R29
+        infinity_roots  R30
+
+;--------------------------------------
+        LDI zero, 0
+        
+        CLR a
+        CLR b
+        CLR c
+        
+        PUSH_NUM 1
+        PUSH_NUM 0
+        SUB_STACK                   
+        POP infinity_roots              ; now infinity_roots = -1
+        
+        CLR sign
+        CLR discriminant
+
+;--------------------------------------
+
+        IN a
+        IN b
+        IN c
+        
+        CALL square_solve
+        
+        OUT num_of_roots                ; number of roots
+        
+        CP num_of_roots, infinity_roots
+        BREQ main_end
+                                        ; countable roots (or 0)
+        CP num_of_roots, zero
+        BREQ main_end
+                                        ; there are 1 or 2 roots
+        OUT_STACK                       ; printing first root
+        POP_STACK
+        DEC num_of_roots
+        CP num_of_roots, zero
+        BREQ main_end
+                                        ; there are 2 roots
+        OUT_STACK                       ; printing second root
+        POP_STACK
+        
+main_end:
+        END
+
+;==========LINE-SOLVER=================
+        
+line_solve:        
+        ; extern a
+        ; extern b
+        ; extern zero
+        ; extern infinity_roots
+        ; extern num_of_roots
+        
+        CP a, zero
+        BRNE LN_a_is_not_0
+                                        ; here a = 0
+            CP b, zero
+            BRNE LN_b_is_not_0
+                                        ; here b = 0
+                MOV num_of_roots, infinity_roots
+                RET
+LN_b_is_not_0:
+            CLR num_of_roots
+            RET
+LN_a_is_not_0:
+        SER num_of_roots
+        CP b, zero
+        BRNE LN_b_is_not_0_a_is
+            PUSH_NUM 0
+            RET
+LN_b_is_not_0_a_is:
+        PUSH a  
+        PUSH b
+        DIV_STACK
+        PUSH_NUM 0
+        SUB_STACK                       ; now -b/a is in stack
+        RET
+
+;==========SQUARE-SOLVER===============
+
+square_solve:
+        ; extern a
+        ; extern b
+        ; extern c
+        ; extern zero
+        ; extern sign
+        ; extern discriminant
+        ; extern infinity_roots
+        
+        CP a, zero
+        BRNE SQ_a_is_not_0
+                                        ; b*x + c = 0
+            MOV a, b
+            MOV b, c
+            CALL line_solve             ; ==> solving b*x + c = 0
+            RET
+SQ_a_is_not_0:
+        CP c, 0
+        BRNE SQ_c_is_not_0
+                                        ; a*x^2 + b*x = 0
+            PUSH_NUM 0                  ; ==> x1 = 0
+            CALL line_solve             ; ==> solving a*x + b = 0
+            CP_STACK
+            BREQ SQ_line_root_0
+                                        ; if x2 != 0
+                INC num_of_roots
+    SQ_line_root_0:
+            RET
+            
+SQ_c_is_not_0:
+        CP b, zero
+        BRNE SQ_b_is_not_0
+                                        ; a*x^2 + c = 0
+            PUSH a
+            PUSH c
+            MUL_STACK
+            POP sign                    ; sign ~ a * c
+            CP sign, zero
+            BRMI SQ_c_and_a_diff_sign
+                                        ; a * c > 0 (same sign)
+                CLR num_of_roots        ; ==> no roots
+                RET
+SQ_c_and_a_diff_sign:
+                                        ; a * c < 0 (diff sign)
+            LDI num_of_roots, 2
+            PUSH c
+            PUSH a
+            DIV_STACK
+            PUSH_NUM 0
+            SUB_STACK
+            SQRT_STACK                  ; x1 = sqrt(-c / a)
+            
+            COPY_STACK
+            PUSH_NUM 0
+            SUB_STACK                   ; x2 = -x1
+            RET
+SQ_b_is_not_0:
+                                        ; a*x^2 + b*x + c = 0
+        PUSH_NUM 4
+        PUSH a
+        MUL_STACK
+        PUSH c
+        MUL_STACK                       ; 4*a*c
+        
+        PUSH b
+        PUSH b
+        MUL_STACK                       ; b^2
+        
+        SUB_STACK
+        POP discriminant                ; D = b^2 - 4*a*c
+        PUSH discriminant
+        
+        CP discriminant, zero
+        BRMI SQ_D_less_0
+            BREQ SQ_D_is_0
+                                        ; D > 0
+                LDI num_of_roots, 2     ; ==> 2 roots
+                
+                SQRT_STACK
+                PUSH b
+                PUSH_NUM 0
+                SUB_STACK
+                ADD_STACK               ; -b + sqrt(D)
+                
+                PUSH a
+                PUSH_NUM 2
+                MUL_STACK
+                SWAP_STACK
+                DIV_STACK               ; x1 = (-b + sqrt(D))/2*a
+                
+                COPY_STACK
+                PUSH a
+                PUSH b
+                DIV_STACK
+                ADD_STACK
+                PUSH_NUM 0
+                SUB_STACK               ; x2 = -b/a - x1
+                RET
+SQ_D_is_0:
+                                        ; D = 0
+            SER num_of_roots            ; ==> 1 root
+            
+            PUSH a
+            PUSH_NUM 2
+            MUL_STACK
+            PUSH b
+            DIV_STACK
+            PUSH_NUM 0
+            SUB_STACK
+            RET
+SQ_D_less_0:
+                                        ; D < 0
+        CLR num_of_roots                ; ==> no roots
+        RET
+ 

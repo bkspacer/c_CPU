@@ -1,5 +1,4 @@
 #include "processor.h"
-#include "../lib/osm_comands.h"
 
 
 //=====================================================================
@@ -21,55 +20,81 @@ void print_code(const int* code, int code_len, int bytes_in_line)
 
 int* loadcode(char* filename, size_t* code_len)
 {
+    PRINTF(UNDERLINE"\nLOADING FORM FILE"RESET" %s\n", filename);
     struct stat st = {};
     stat(filename, &st);
     *code_len = st.st_size;
 
+    FILE* codefile = fopen(filename, "rb");
+
+    if(!codefile)
+    {
+        printf(RED"\tNO SUCH FILE IN THE DIRECTORY\n"RESET);
+        return NULL;
+    }
+
     int* code = (int*) calloc(*code_len, sizeof(int));
 
-    FILE* codefile = fopen(filename, "rb");
+    if(!code)
+    {
+        printf(RED"\tCOULD NOT FIND SPACE FOR THE CODE\n"RESET);
+        return NULL;
+    }
+
     for(size_t i = 0; i < *code_len; ++i)
         code[i] = getc(codefile);
     fclose(codefile);
 
+    PRINTF("\t[  "GREEN"OK"RESET"  ]\n");
     return code;
 }
 
 int process(int* PC0)
 {
-    int REG[REG_CAPACITY];
-    int SRAM[SRAM_CAPACITY];
+    int REG[REG_CAPACITY];      // register array
+    int SRAM[SRAM_CAPACITY];    // SRAM array
 
-    struct Stack STACK_ = {};
+    struct Stack STACK_ = {};   // stack
     Stack_construct(STACK_);
     struct Stack* STACK = &STACK_;
 
-    struct Stack CALL_STACK_ = {};
+    struct Stack CALL_STACK_ = {}; // stack of called commands
     Stack_construct(CALL_STACK_);
     struct Stack* CALL_STACK = &CALL_STACK_;
 
-    int* PC = PC0;
-    int Rd = 0, Rr = 0, K = 0, k = 0, cp_res = 0, LBL = 0;
-    double st_1 = 0, st_2 = 0;
-    int processing = 1;
+    int* PC = PC0;      // first byte position
+    int Rd = 0, Rr = 0; // registers positions
+    int K = 0;          // constant number
+    int k = 0;          // constant SRAM address
+    int LBL = 0;        // code label
+    int cp_res = 0;     // comparison flag
+    double st_1 = 0, st_2 = 0; // variables to operate with stack
+
+    PRINTF(UNDERLINE"\nPROCESSING\n"RESET);
+    int processing = 1; // is 1 while code is running
+    int com_code = 0; // current pro
     while(processing)
     {
-        int com_code = *PC++;
-        switch(com_code)
+        switch(com_code = *PC++)
         {
 
-        #define DEF_CMD( name, code, argc, instruction) case CMD_##name: instruction; break;
+        #define DEF_CMD( name, code, argc, instruction) case CMD_##name: PRINTF("0x%02X: %s\t", code, #name); instruction; break;
             #include "../lib/asm_commands.h"
         #undef DEF_CMD
 
         default:
-            printf(RED ALERT"AN UNDEFINED COMMAND CODE"RESET);
-            processing = 0;
+            printf(RED ALERT"AN UNDEFINED COMMAND CODE: 0x%02X\n"RESET, com_code);
+            Stack_destruct(STACK);
+            Stack_destruct(CALL_STACK);
+            return 1;
             break;
         }
+        PRINTF("\n");
     }
-    Stack_destruct(STACK);
-    Stack_destruct(CALL_STACK);
+
+
+
+    PRINTF(UNDERLINE"\nPROCESSING COMPLETED\n"RESET);
     return 0;
 }
 

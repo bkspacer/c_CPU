@@ -31,8 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../lib/asm_commands.h" />
-		<Unit filename="../lib/osm_comands.h" />
+		<Unit filename="../lib/asm_language.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lib/asm_language.h" />
 		<Unit filename="../lib/stack.c">
 			<Option compilerVar="CC" />
 		</Unit>

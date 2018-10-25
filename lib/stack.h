@@ -39,9 +39,6 @@ typedef double stack_val_type;/**< Type of items in stack, may be changed to cha
 
 /** \brief Realization of stack as a structure
  *
- *
- * \param int using_state - current state of using stack: RELEASE / TESTING / DEBUG
- *
  * \param char name[50] - name of the stack by which it is used in the function that created the stack
  * \param int size - current number of items in the stack
  * \param capacity - current maximum of size
@@ -98,7 +95,6 @@ void Stack_destruct(struct Stack* this);
  * \param new_item stack_val_type [in] - new item to be pushed
  * \return (ERROR) - if an error occurred, else (OK)
  *
- * \warning Calls ABORT if (using_state) is RELEASE or DEBUG
  */
 int Stack_push(struct Stack* this, stack_val_type new_item);
 
@@ -109,12 +105,11 @@ int Stack_push(struct Stack* this, stack_val_type new_item);
  * \param new_item stack_val_type [out] - the item that was popped
  * \return (ERROR) - if an error occurred, else (OK)
  *
- * \warning Calls ABORT if (using_state) is RELEASE or DEBUG
  */
 int Stack_pop(struct Stack* this, stack_val_type* out_item);
 
 //==========__DUMP__==================
-/** \brief Prints detailed info if (using_state) = DEBUG
+/** \brief Prints detailed info
  *
  * \param this const struct Stack* [in] - stack to be printed
  */

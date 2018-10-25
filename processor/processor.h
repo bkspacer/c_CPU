@@ -1,3 +1,5 @@
+/** \file processor.h
+ */
 #ifndef PROCESSOR_H_INCLUDED
 #define PROCESSOR_H_INCLUDED
 
@@ -6,7 +8,7 @@
 #include <math.h>
 #include <sys/stat.h>
 #include "../lib/stack.h"
-
+#include "../lib/asm_language.h"
 
 /** \brief Prints code in hex form: | 0x** 0x** 0x** 0x** |
  *
@@ -30,7 +32,7 @@ int* loadcode(char* filename, size_t* code_len);
 
 /** \brief Processes the given code according to asm_commands.h
  *
- * \param PC0 int* [in] - the code to process
+ * \param PC0 int* [in] - first byte of the code to process
  * \return (1) if a bad error occurred; (0) if it did not
  *
  */

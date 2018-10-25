@@ -1,3 +1,5 @@
+/** \file assembler.h
+ */
 #ifndef ASSEMBLER_H_INCLUDED
 #define ASSEMBLER_H_INCLUDED
 
@@ -5,7 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "./../lib/strings_int.h"
+#include "../lib/strings_int.h"
+#include "../lib/asm_language.h"
 
 #define RED         "\033[0;31m"
 #define GREEN       "\033[0;32m"
@@ -49,7 +52,7 @@ struct Variable
 
 int num_of_labels;      /**< The number of labels that were found so far */
 int num_of_variables;   /**< The number of variables that were found so far */
-int assembling;         /**< (1) if it is the first assebling, (2) - if it the second one (importing labels values) */
+int assembling;         /**< (1) if it is the first assembling, (2) - if it the second one (importing labels values) */
 
 
 //=====================================================================

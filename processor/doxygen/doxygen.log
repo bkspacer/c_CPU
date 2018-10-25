@@ -1,0 +1,6 @@
+/home/oleg/code_blocks_projects/c_CPU/lib/stack.h:102: warning: argument 'new_item' of command @param is not found in the argument list of Stack_pop(struct Stack *this, stack_val_type *out_item)
+/home/oleg/code_blocks_projects/c_CPU/lib/stack.h:109: warning: The following parameters of Stack_pop(struct Stack *this, stack_val_type *out_item) are not documented:
+  parameter 'out_item'
+/home/oleg/code_blocks_projects/c_CPU/lib/strings_int.h:16: warning: argument 'n' of command @param is not found in the argument list of istext(char c)
+/home/oleg/code_blocks_projects/c_CPU/lib/strings_int.h:22: warning: The following parameters of istext(char c) are not documented:
+  parameter 'c'

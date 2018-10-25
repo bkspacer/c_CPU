@@ -2,7 +2,7 @@
 1540396269 source:/home/oleg/code_blocks_projects/c_CPU/lib/stack.c
 	"stack.h"
 
-1540387398 /home/oleg/code_blocks_projects/c_CPU/lib/stack.h
+1540495135 /home/oleg/code_blocks_projects/c_CPU/lib/stack.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -18,29 +18,34 @@
 	<assert.h>
 	<ctype.h>
 
-1540420446 source:/home/oleg/code_blocks_projects/c_CPU/assembler/assembler.c
+1540444824 source:/home/oleg/code_blocks_projects/c_CPU/assembler/assembler.c
 	"assembler.h"
-	"./../lib/osm_comands.h"
 	"../lib/asm_commands.h"
 
-1540418781 /home/oleg/code_blocks_projects/c_CPU/assembler/assembler.h
+1540495964 /home/oleg/code_blocks_projects/c_CPU/assembler/assembler.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	"./../lib/strings_int.h"
+	"../lib/strings_int.h"
+	"../lib/asm_language.h"
 
-1540394700 /home/oleg/code_blocks_projects/c_CPU/lib/osm_comands.h
+1540443341 /home/oleg/code_blocks_projects/c_CPU/lib/osm_comands.h
 	"../lib/stack.h"
 	"asm_commands.h"
-	"asm_commands.h"
 
-1540418527 source:/home/oleg/code_blocks_projects/c_CPU/assembler/main.c
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
+1540495401 source:/home/oleg/code_blocks_projects/c_CPU/assembler/main.c
 	"assembler.h"
+	"../lib/strings_int.h"
 
-1540419228 /home/oleg/code_blocks_projects/c_CPU/lib/asm_commands.h
+1540479228 /home/oleg/code_blocks_projects/c_CPU/lib/asm_commands.h
 
 1540384074 /home/oleg/code_blocks_projects/c_CPU/assembler/commands.h
+
+1540495565 /home/oleg/code_blocks_projects/c_CPU/lib/asm_language.h
+	<stdio.h>
+	"asm_commands.h"
+
+1540494124 source:/home/oleg/code_blocks_projects/c_CPU/lib/asm_language.c
+	"asm_language.h"
+	"asm_commands.h"
 
