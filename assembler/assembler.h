@@ -31,8 +31,8 @@
  *
  */
 struct Label
-{
-    int pos;
+{                                                   /*it's more corretly to use union construction (described in K&N, para 6.8)*/
+    int pos;                                        /*they were included into ANSI standard special for solving this type of problems*/
     char name[MAX_STR_LEN];
 } Labels[MAX_LBL_NUM];
 
