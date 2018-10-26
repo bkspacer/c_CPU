@@ -1,0 +1,270 @@
+COMMAND_NAME_______: ADD
+CODE_______________: 0x01
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] += REG[Rr]; }
+
+COMMAND_NAME_______: ADD_STACK
+CODE_______________: 0x0A
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); PUSH_(st_1 + st_2); }
+
+COMMAND_NAME_______: SUB
+CODE_______________: 0x02
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] -= REG[Rr]; }
+
+COMMAND_NAME_______: SUB_STACK
+CODE_______________: 0x0B
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); PUSH_(st_1 - st_2); }
+
+COMMAND_NAME_______: INC
+CODE_______________: 0x03
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); REG[Rd]++; }
+
+COMMAND_NAME_______: DEC
+CODE_______________: 0x04
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); REG[Rd]--; }
+
+COMMAND_NAME_______: CLR
+CODE_______________: 0x05
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); REG[Rd] = 0; }
+
+COMMAND_NAME_______: SER
+CODE_______________: 0x06
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); REG[Rd] = 1; }
+
+COMMAND_NAME_______: MUL
+CODE_______________: 0x07
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] *= REG[Rr]; }
+
+COMMAND_NAME_______: MUL_STACK
+CODE_______________: 0x0C
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); PUSH_(st_1 * st_2); }
+
+COMMAND_NAME_______: DIV
+CODE_______________: 0x08
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] /= REG[Rr]; }
+
+COMMAND_NAME_______: DIV_STACK
+CODE_______________: 0x0D
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); PUSH_(st_1 / st_2); }
+
+COMMAND_NAME_______: SQRT_STACK
+CODE_______________: 0x0E
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); PUSH_(sqrt(st_1)); }
+
+COMMAND_NAME_______: RET
+CODE_______________: 0x00
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { CALL_POP(LBL); PC = PC0 + LBL; }
+
+COMMAND_NAME_______: JMP
+CODE_______________: 0x11
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(LBL); PC = PC0 + LBL; }
+
+COMMAND_NAME_______: CALL
+CODE_______________: 0x12
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { CALL_PUSH(); GET(LBL); PC = PC0 + LBL; }
+
+COMMAND_NAME_______: CP
+CODE_______________: 0x13
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); cp_res = REG[Rd] - REG[Rr]; }
+
+COMMAND_NAME_______: CP_STACK
+CODE_______________: 0x14
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); cp_res = st_1 - st_2; PUSH_(st_2); PUSH_(st_1); }
+
+COMMAND_NAME_______: BREQ
+CODE_______________: 0x15
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(LBL); if(cp_res == 0) PC = PC0 + LBL; }
+
+COMMAND_NAME_______: BRNE
+CODE_______________: 0x16
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(LBL); if(cp_res != 0) PC = PC0 + LBL; }
+
+COMMAND_NAME_______: BRPL
+CODE_______________: 0x17
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(LBL); if(cp_res > 0) PC = PC0 + LBL; }
+
+COMMAND_NAME_______: BRMI
+CODE_______________: 0x18
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(LBL); if(cp_res < 0) PC = PC0 + LBL; }
+
+COMMAND_NAME_______: MOV
+CODE_______________: 0x31
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] = REG[Rr]; }
+
+COMMAND_NAME_______: LDI
+CODE_______________: 0x32
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(K); REG[Rd] = K; }
+
+COMMAND_NAME_______: LD
+CODE_______________: 0x33
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); REG[Rd] = SRAM[REG[Rr]]; }
+
+COMMAND_NAME_______: LDD
+CODE_______________: 0x34
+NUMBER_OF_ARGUMENTS: 3
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); GET(K); REG[Rd] = SRAM[REG[Rr] + K]; }
+
+COMMAND_NAME_______: LDS
+CODE_______________: 0x35
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(k); REG[Rd] = SRAM[k]; }
+
+COMMAND_NAME_______: ST
+CODE_______________: 0x36
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rd); GET(Rr); SRAM[REG[Rd]] = REG[Rr]; }
+
+COMMAND_NAME_______: STD
+CODE_______________: 0x37
+NUMBER_OF_ARGUMENTS: 3
+INSTRUCTION________: 
+                     { GET(Rd); GET(K); GET(Rr); SRAM[REG[Rd] + K] = REG[Rr]; }
+
+COMMAND_NAME_______: STS
+CODE_______________: 0x38
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(k); GET(Rr); SRAM[k] = REG[Rr]; }
+
+COMMAND_NAME_______: IN
+CODE_______________: 0x39
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); scanf("%i", REG + Rd); }
+
+COMMAND_NAME_______: IN_STACK
+CODE_______________: 0x3F
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { scanf("%lg", &st_1); PUSH_(st_1); }
+
+COMMAND_NAME_______: OUT
+CODE_______________: 0x3A
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rr); printf("\n%i", REG[Rr]); }
+
+COMMAND_NAME_______: OUT_STACK
+CODE_______________: 0x3E
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); printf("\n%lg", st_1); PUSH_(st_1); }
+
+COMMAND_NAME_______: PUSH
+CODE_______________: 0x41
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rr); PUSH_(REG[Rr]); }
+
+COMMAND_NAME_______: PUSH_NUM
+CODE_______________: 0x4A
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(K); PUSH_(K); }
+
+COMMAND_NAME_______: PUSH_S_NUM
+CODE_______________: 0x4B
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(k); PUSH_(SRAM[k]); }
+
+COMMAND_NAME_______: PUSH_S_REG
+CODE_______________: 0x4C
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rr); PUSH_(SRAM[REG[Rr]]); }
+
+COMMAND_NAME_______: PUSH_S_REG_PLUS_NUM
+CODE_______________: 0x4D
+NUMBER_OF_ARGUMENTS: 2
+INSTRUCTION________: 
+                     { GET(Rr); GET(K); PUSH_(SRAM[REG[Rr] + K]); }
+
+COMMAND_NAME_______: POP
+CODE_______________: 0x42
+NUMBER_OF_ARGUMENTS: 1
+INSTRUCTION________: 
+                     { GET(Rd); POP_(st_1); REG[Rd] = (int) st_1; }
+
+COMMAND_NAME_______: POP_STACK
+CODE_______________: 0x4E
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); }
+
+COMMAND_NAME_______: COPY_STACK
+CODE_______________: 0x43
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); PUSH_(st_1); PUSH_(st_1); }
+
+COMMAND_NAME_______: SWAP_STACK
+CODE_______________: 0x44
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { POP_(st_1); POP_(st_2); PUSH_(st_1); PUSH_(st_2); }
+
+COMMAND_NAME_______: NOP
+CODE_______________: 0xF0
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { }
+
+COMMAND_NAME_______: END
+CODE_______________: 0xFF
+NUMBER_OF_ARGUMENTS: 0
+INSTRUCTION________: 
+                     { processing = 0; }
+

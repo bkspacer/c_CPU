@@ -5,9 +5,9 @@
 
 #include <stdio.h>
 
-#define MAX_STR_LEN    (100) /**< Maximun of string length */
-#define MAX_OF_ARGC    (3)   /**< Maximun of commands arguments */
-#define SRAM_CAPACITY  (32)  /**< Capacity of SRAM array  */
+#define MAX_STR_LEN    (100) /**< Maximum of string length */
+#define MAX_OF_ARGC    (3)   /**< Maximum of commands arguments */
+#define SRAM_CAPACITY  (32)  /**< Capacity of SRAM array */
 #define REG_CAPACITY   (128) /**< Capacity of MAX_OF_ARGC array */
 
 #define RED         "\033[0;31m"

@@ -6,6 +6,11 @@
 
 int main()
 {
+    print_assembler_info();
+
+    printf(RED"! IF YOU HAVE NOT YET READ THE LANGUAGE MANUAL, CHECK \"FULL_ASM_MANUAL.txt\"\n"
+           "! READ \"BRIEF_ASM_MANUAL.txt\" TO CHECK ALL DESCRIBED FUNCTIONS\n\n"RESET);
+
     printf(BLUE"# Disassembler\n"
            "# (c) OlegZ 2018\n"RESET);
 

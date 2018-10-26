@@ -185,8 +185,8 @@ DEF_CMD(LDD,  0x34, 3,
 {
     GET(Rd);
     GET(Rr);
-    GET(k);
-    REG[Rd] = SRAM[REG[Rr] + k];
+    GET(K);
+    REG[Rd] = SRAM[REG[Rr] + K];
 })
 DEF_CMD(LDS,  0x35, 2,
 {
@@ -206,9 +206,9 @@ DEF_CMD(ST,   0x36, 2,
 DEF_CMD(STD,  0x37, 3,
 {
     GET(Rd);
-    GET(k);
+    GET(K);
     GET(Rr);
-    SRAM[REG[Rd] + k] = REG[Rr];
+    SRAM[REG[Rd] + K] = REG[Rr];
 })
 DEF_CMD(STS,  0x38, 2,
 {
@@ -269,8 +269,8 @@ DEF_CMD(PUSH_S_REG, 0x4C, 1,
 DEF_CMD(PUSH_S_REG_PLUS_NUM, 0x4D, 2,
 {
     GET(Rr);
-    GET(k);
-    PUSH_(SRAM[REG[Rr] + k]);
+    GET(K);
+    PUSH_(SRAM[REG[Rr] + K]);
 })
 
 //====================================================

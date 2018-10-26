@@ -6,6 +6,11 @@
 
 int main()
 {
+    print_assembler_info();
+
+    printf(RED"! IF YOU HAVE NOT YET READ THE LANGUAGE MANUAL, CHECK \"FULL_ASM_MANUAL.txt\"\n"
+           "! READ \"BRIEF_ASM_MANUAL.txt\" TO CHECK ALL DESCRIBED FUNCTIONS\n\n"RESET);
+
     printf(BLUE"# Assembler\n"
            "# (c) OlegZ 2018\n"RESET);
 
@@ -26,11 +31,16 @@ int main()
 
     char* program = fgetfile(infilename, &num_of_lines);
     if(!program)
+    {
+        printf(RED ALERT"FATAL ERROR"RESET);
         return 1;
+    }
+
 
     char** prog_arr = slicedtext(program, num_of_lines);
     if(!prog_arr)
     {
+        printf(RED ALERT"FATAL ERROR"RESET);
         DELETE(program);
         return 1;
     }
@@ -41,7 +51,7 @@ int main()
 
     //** Assembling
 
-    int* code = (int*) calloc(3 * num_of_lines, sizeof(int)); // There are no functions that need more than 3 arguments
+    int* code = (int*) calloc(MAX_OF_ARGC * num_of_lines, sizeof(int)); // There are no functions that need more than 3 arguments
     int byte_count;
 
     int result = assemble(prog_arr, num_of_lines, code, &byte_count);

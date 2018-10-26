@@ -1,0 +1,127 @@
+
+FILES
+ * NOTICE: For detailed description see DoxyGen pages.
+|-------------|-------------------------------------------------------|
+  Folder name | Brief description
+|-------------|-------------------------------------------------------|
+    assembler | Converts assembler program into binary assembler code.
+    processor | Executes binary assembler code.
+ disassembler | Converts binary assembler code into assembler program.
+          lib | Shared  project libraries; contains "asm_commands.h".
+|-------------|-------------------------------------------------------|
+
+DEATAILS
+ * All input files must be placed in the folder, where "lib", "assembler" and so on are placed.
+ * All output files will be placed in the same folder.
+ * * You can correct the places by yourself, but if only you are able to, so better do not.
+ 
+
+|----------------------------------------------------| LANGUAGE DETAILS |-----------------------------------------|
+
+VARIABLES
+ * Allowed variables symbols are 'A'-'Z', 'a'-'z', '0'-'9', and '_'.
+ * Allowed variables types are register and anumber.
+ * All the variables are global, keep this in mind when coding assembler functions.
+
+LABELS
+ * Allowed labels symbols are 'A'-'Z', 'a'-'z', '0'-'9', and '_'.
+ * After the label name there must be ':'.
+ * The line right after the ':' will be interpreted as an ordinary line (that allows you to make several labels for ane place and continue program commands right after them).
+
+COMMENTS
+ * Everything after ';' to the end of line will be interpreted as a comment.
+ 
+COMMANDS
+ * You may add new commands in "lib/asm_commands.h" by adding:
+    DEF_CMD(<command name>, <code of the command>, <number of variables>, {<C-based instruction which describes the command>})
+ * WARNINGS:
+ * * Allowed commands symbols are 'A'-'Z', 'a'-'z', '0'-'9', and '_';
+ * * Commands names must not repeat;
+ * * Commands codes must not repeat;
+ * * If any libraries are needed for correct work of given instuction, include them in "lib/processor.h".
+ * File "BRIEF_ASM_MANUAL.txt" will detect the changes automatically, but not this one. Please, do not change this manual in any case, instead add your personal commands in "USER_COMMANDS.txt".
+
+ 
+|------------------------------------------------| DEFAULT INSTRUCTIONS |-----------------------------------------|
+
+|---| MCU VARIABLES & FLAGS
+ * C  - comparison flag
+ * PC - corrent program position
+ 
+|---| PARAMETERS
+ * Rd, Rr - registers
+ * K      - constant number
+ * k      - constant SRAM address
+ * LBL    - position in code
+ 
+|---| MEMORY
+ * STACK      - stack of double numbers to calculate floating point numbers
+ * CALL_STACK - stack carrying the order of positions in which functions were called
+ * SRAM       - array af integer numbers
+ 
+|---| NOTATIONS
+ * destination <- new value
+ * (item in SRAM)
+ * <abstrsct description>
+ 
+|--------------------|------------|------------------------------------------|------------------------------------|
+                     |            |                                          |
+        Command name | Parameters | Instruction in words                     | Brief description
+                     |            |                                          |
+|--------------------|------------|------------| ARITHMETIC INSTRUCTIONS |---|------------------------------------|
+                 ADD | Rd, Rr     | Add two registers                        | Rd <- Rd + Rr
+           ADD_STACK |            | Summarize two last values in stack       | STACK <- STACK + STACK
+                 SUB | Rd, Rr     | Subtract two registers                   | Rd <- Rd - Rr
+           SUB_STACK |            | Subtract two last values in stack        | STACK <- STACK - STACK
+                 INC | Rd         | Increase register                        | Rd <- Rd + 1
+                 DEC | Rd         | Decrease register                        | Rd <- Rd - 1
+                 CLR | Rd         | Set register to 0                        | Rd <- 0
+                 SER | Rd         | Set register to 1                        | Rd <- 1
+                 MUL | Rd, Rr     | Multiply two registers                   | Rd <- Rd * Rr
+           MUL_STACK |            | Multiply two last values in stack        | STACK <- STACK * STACK
+                 DIV | Rd, Rr     | Divide two registers                     | Rd <- Rd / Rr
+           DIV_STACK |            | Divide two last values in stack          | STACK <- STACK / STACK
+          SQRT_STACK |            | Square root of last value in stack       | STACK <- sqrt(STACK)
+                     |            |                                          |
+|--------------------|------------|----------------| BRANCH INSTRUCTIONS |---|------------------------------------|
+                 RET |            | Subroutine return                        | PC <- CALL_STACK
+                 JMP | LBL        | Jump to label                            | PC <- LBL
+                CALL | LBL        | Direct subroutine call                   | CALL_STACK <- PC + 1; PC <- LBL
+                  CP | Rd, Rr     | Compare registers                        | C <- Rd - Rr
+            CP_STACK |            | Compare last two values in stack         | C <- STACK - STACK; <restore stack>
+                BREQ | LBL        | Branch if equal                          | if(C == 0) PC <- LBL
+                BRNE | LBL        | Branch if not equal                      | if(C != 0) PC <- LBL
+                BRPL | LBL        | Branch if plus                           | if(C > 0) PC <- LBL
+                BRMI | LBL        | Branch if minus                          | if(C < 0) PC <- LBL
+                     |            |                                          |
+|--------------------|------------|---------| DATA TRANSFER INSTRUCTIONS |---|------------------------------------|
+                 MOV | Rd, Rr     | Copy register                            | Rd <- Rr
+                 LDI | Rd, K      | Load immediate                           | Rd <- K
+                  LD | Rd, Rr     | Load indirect (SRAM)                     | Rd <- (Rr)
+                 LDD | Rd, Rr, K  | Load indirect with displacement (SRAM)   | Rd <- (Rr + K)
+                 LDS | Rd, k      | Load direct (SRAM)                       | Rd <- (k)
+                  ST | Rd, Rr     | Store indirect (SRAM)                    | (Rd) <- Rr
+                 STD | Rd, K, Rr  | Store indirect with displacement (SRAM)  | (Rd + K) <- Rr
+                 STS | k, Rr      | Store direct (SRAM)                      | (k) <- Rr
+                     |            |                                          |
+|--------------------|------------|----------| INPUT/OUTPUT INSTRUCTIONS |---|------------------------------------|
+                  IN | Rd         | Read register from console               | Rd <- IN
+            IN_STACK |            | Read stack value from console            | STACK <- IN
+                 OUT | Rr         | Print register in console                | OUT <- Rr
+           OUT_STACK |            | Print last stack value in console        | OUT <- STACK; <restore stack>
+                     |            |                                          |
+|--------------------|------------|-----------------| STACK INSTRUCTIONS |---|------------------------------------|
+                PUSH | Rr         | Put register to stack                    | STACK <- Rr
+            PUSH_NUM | K          | Put immediate to stack                   | STACK <- K
+          PUSH_S_NUM | k          | Put direct to stack (SRAM)               | STACK <- (k)
+          PUSH_S_REG | Rr         | Put indirect to stack (SRAM)             | STACK <- (Rr)
+ PUSH_S_REG_PLUS_NUM | Rr, K      | Put indirect with displacement (SRAM)    | STACK <- (Rr + K)
+                 POP | Rd         | Set register as the last value in stack  | Rd <- STACK
+           POP_STACK |            | Delete the last value in stack           | <trash> <- STACK
+          COPY_STACK |            | Duplicate the last value in stack        | STACK <- STACK <- STACK
+          SWAP_STACK |            | Swap two last items in stack             | <it just works>
+                     |            |                                          |
+|--------------------|------------|-----------| MCU CONTROL INSTRUCTIONS |---|------------------------------------|
+                 NOP |            | Do nothing                               | <nothing>
+                 END |            | Exit program                             | <exits program>
+|--------------------|------------|------------------------------------------|------------------------------------|

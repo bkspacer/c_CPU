@@ -38,13 +38,13 @@
 	"../lib/stack.h"
 	"asm_commands.h"
 
-1540479228 /home/oleg/code_blocks_projects/c_CPU/lib/asm_commands.h
+1540576410 /home/oleg/code_blocks_projects/c_CPU/lib/asm_commands.h
 
-1540494124 source:/home/oleg/code_blocks_projects/c_CPU/lib/asm_language.c
+1540576415 source:/home/oleg/code_blocks_projects/c_CPU/lib/asm_language.c
 	"asm_language.h"
 	"asm_commands.h"
 
-1540495565 /home/oleg/code_blocks_projects/c_CPU/lib/asm_language.h
+1540579744 /home/oleg/code_blocks_projects/c_CPU/lib/asm_language.h
 	<stdio.h>
 	"asm_commands.h"
 

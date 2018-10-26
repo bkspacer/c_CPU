@@ -69,12 +69,18 @@ void print_arg(int argtype, int arg)
 
 void print_assembler_info()
 {
-    #define DEF_CMD( name, code, argc, instruction ) printf(UNDERLINE"COMMAND NAME       "RESET BLUE": %s\n"RESET\
-                                                            UNDERLINE"CODE               "RESET": 0x%02X\n"\
-                                                            UNDERLINE"NUMBER OF ARGUMENTS"RESET": %d\n"\
-                                                            UNDERLINE"INSTRUCTION        "RESET": \n\t%s\n\n", #name, code, argc, #instruction);
+    FILE* outfile = fopen("../BRIEF_ASM_MANUAL.txt", "w");
+    #define DEF_CMD( name, code, argc, instruction ) \
+    {\
+        fprintf(outfile, \
+               "COMMAND_NAME_______: %s\n"\
+               "CODE_______________: 0x%02X\n"\
+               "NUMBER_OF_ARGUMENTS: %d\n"\
+               "INSTRUCTION________: \n"\
+               "                     %s\n\n", #name, code, argc, #instruction);\
+    }
     #include "asm_commands.h"
     #undef DEF_CMD
-
+    fclose(outfile);
     return;
 }
