@@ -1,0 +1,14 @@
+Hello, I'm sorry for my mistakes in english, but project author asked me to write this not in Russian
+
+I couldn'n find mistakes and disadvantages in this project, so I'll discribe features I've enjoyed the most.
+Project contains three base code blocks: assembler, processor, disassembler.
+I'll describe them in this order.
+  1. Assemler prog is able to compile prog which was written by user into processor code, processor runs compiled program (it is emulation of 
+  physical stack processor), diassembler converts output numeric code into understandable form which were set by user. 
+  Deep description of each of them working will be boring, so I accent that every prog action is accompanied by well-detailed log
+  and dump files with colored markers. Notisfaction: colors works only in Linux, and this part (probably it's only one) isn't cross-platform.  
+  
+  2. Than, the greatest feature - manual for his own assembler language. It is very detalaize, contains descrition of all functions used in assemler and project to-do list. There are also an opportunity to include user functions into his own file with manual template.
+  
+3. Every function in source is documentated by doxygen, source has pleasant formatting and is easy-read. In conclusion, XFireFall created perfect project, and he shows his high programming culture and skill. Well done!
+  
